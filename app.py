@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -14,6 +14,11 @@ import random
 from typing import List, Dict, Any
 
 app = FastAPI()
+
+# ---------------------
+# GLOBAL CONTROL
+# ---------------------
+chatbot_active = True   # 🔥 ADMIN CONTROL
 
 # ---------------------
 # TEMPLATES
@@ -62,28 +67,26 @@ def init_db():
 init_db()
 
 # ---------------------
-# LOAD INTENTS (SAFE)
+# LOAD INTENTS
 # ---------------------
 intents: List[Dict[str, Any]] = []
 
-try:
-    if os.path.exists("intents.json") and os.path.getsize("intents.json") > 0:
-        with open("intents.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
+def load_intents():
+    global intents
+    try:
+        if os.path.exists("intents.json") and os.path.getsize("intents.json") > 0:
+            with open("intents.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
 
-        if isinstance(data, list):
-            intents = [i for i in data if isinstance(i, dict)] #type: ignore
-        else:
-            print("Invalid intents format")
-    else:
-        print("intents.json missing or empty")
+            if isinstance(data, list):
+                intents = [i for i in data if isinstance(i, dict)] #type: ignore
+    except Exception as e:
+        print("Error loading intents:", e)
 
-except Exception as e:
-    print("Error loading intents:", e)
-    intents = []
+load_intents()
 
 # ---------------------
-# AI RESPONSE FUNCTION
+# AI RESPONSE
 # ---------------------
 def get_response(user_msg: str) -> str:
     user_msg = user_msg.lower().strip()
@@ -92,44 +95,31 @@ def get_response(user_msg: str) -> str:
     best_responses = []
 
     for intent in intents:
-        if not isinstance(intent, dict): #type: ignore
-            continue
-
         patterns = intent.get("patterns", [])
         responses = intent.get("responses", [])
 
-        if not patterns or not responses:
-            continue
-
         for pattern in patterns:
-            if not isinstance(pattern, str):
-                continue
-
             pattern = pattern.lower()
 
-            # ✅ EXACT MATCH
             if user_msg == pattern:
                 return random.choice(responses)
 
-            # ✅ CONTAINS MATCH
             if user_msg in pattern or pattern in user_msg:
                 return random.choice(responses)
 
-            # ✅ FUZZY MATCH
             score = fuzz.token_sort_ratio(user_msg, pattern)
 
             if score > best_score:
                 best_score = score
                 best_responses = responses
 
-    # ✅ FINAL RESPONSE
     if best_score > 60 and best_responses:
         return random.choice(best_responses) #type: ignore
 
     return "Ask me something about AI 😊"
 
 # ---------------------
-# ROUTES
+# HOME
 # ---------------------
 @app.get("/", response_class=HTMLResponse)
 def home():
@@ -148,10 +138,16 @@ def admin_panel(request: Request):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT rowid, username FROM users")
+    # 🔥 USER ANALYTICS
+    cursor.execute("""
+    SELECT users.rowid, users.username, COUNT(chat_history.id)
+    FROM users
+    LEFT JOIN chat_history ON users.username = chat_history.username
+    GROUP BY users.username
+    """)
     users = cursor.fetchall()
 
-    cursor.execute("SELECT id, username, sender, message, time FROM chat_history")
+    cursor.execute("SELECT id, username, sender, message, time FROM chat_history ORDER BY id DESC")
     chats = cursor.fetchall()
 
     conn.close()
@@ -159,10 +155,44 @@ def admin_panel(request: Request):
     return templates.TemplateResponse("admin.html", {
         "request": request,
         "users": users,
-        "chats": chats
+        "chats": chats,
+        "bot_status": chatbot_active
     })
 
+# ---------------------
+# TOGGLE CHATBOT
+# ---------------------
+@app.get("/toggle_bot")
+def toggle_bot(request: Request):
+    global chatbot_active
+
+    user = request.cookies.get("user")
+    if user != "admin":
+        return JSONResponse({"error": "Unauthorized"}, status_code=403)
+
+    chatbot_active = not chatbot_active
+    return {"status": chatbot_active}
+
+# ---------------------
+# INTENT API
+# ---------------------
+@app.get("/get_intents")
+def get_intents():
+    return intents
+
+@app.post("/update_intents")
+async def update_intents(request: Request):
+    data = await request.json()
+
+    with open("intents.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+    load_intents()
+    return {"status": "updated"}
+
+# ---------------------
 # DELETE USER
+# ---------------------
 @app.get("/delete_user/{user_id}")
 def delete_user(user_id: int):
     conn = get_db()
@@ -181,27 +211,29 @@ def delete_user(user_id: int):
 
     return RedirectResponse("/admin", status_code=303)
 
+# ---------------------
 # DELETE CHAT
+# ---------------------
 @app.get("/delete_chat/{chat_id}")
 def delete_chat(chat_id: int):
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM chat_history WHERE id=?", (chat_id,))
-
     conn.commit()
     conn.close()
 
     return RedirectResponse("/admin", status_code=303)
 
-# CLEAR ALL CHATS
+# ---------------------
+# CLEAR CHATS
+# ---------------------
 @app.get("/clear_chats")
 def clear_chats():
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM chat_history")
-
     conn.commit()
     conn.close()
 
@@ -277,29 +309,27 @@ def chat_page(request: Request):
 
 @app.post("/chat", response_class=HTMLResponse)
 def chat(request: Request, message: str = Form(...)):
+    global chatbot_active
+
     user = request.cookies.get("user")
     if not user:
         return RedirectResponse("/login")
+
+    if not chatbot_active:
+        return RedirectResponse("/chat", status_code=303)
 
     conn = get_db()
     cursor = conn.cursor()
 
     time = datetime.now().strftime("%H:%M")
 
-    # save user message
     cursor.execute(
         "INSERT INTO chat_history (username, sender, message, time) VALUES (?, ?, ?, ?)",
         (user, "user", message, time)
     )
 
-    # get bot reply safely
-    try:
-        reply = get_response(message)
-    except Exception as e:
-        print("AI Error:", e)
-        reply = "Something went wrong. Try again."
+    reply = get_response(message)
 
-    # save bot reply
     cursor.execute(
         "INSERT INTO chat_history (username, sender, message, time) VALUES (?, ?, ?, ?)",
         (user, "bot", reply, time)
@@ -323,4 +353,6 @@ def logout():
 # RUN
 # ---------------------
 if __name__ == "__main__":
+    import uvicorn
     port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
