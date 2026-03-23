@@ -1,3 +1,7 @@
+import secrets
+
+SECRET_KEY = secrets.token_hex(32)
+
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +16,7 @@ import json
 import os
 import random
 from typing import List, Dict, Any
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 app = FastAPI()
 
@@ -65,6 +70,11 @@ def init_db():
     conn.close()
 
 init_db()
+
+
+from starlette.middleware.sessions import SessionMiddleware
+
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 # ---------------------
 # LOAD INTENTS
@@ -130,7 +140,9 @@ def home():
 # ---------------------
 @app.get("/admin", response_class=HTMLResponse)
 def admin_panel(request: Request):
-    user = request.cookies.get("user")
+    request.session["user"] = username
+    user = request.session.get("user")
+    request.session.clear()
 
     if user != "admin":
         return RedirectResponse("/login")
