@@ -1,6 +1,6 @@
 fastapi
 uvicorn
 jinja2
-python-multipart
 werkzeug
 rapidfuzz
+itsdangerous
