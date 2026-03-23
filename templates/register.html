@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* LEFT SIDE */
+        .left {
+            width: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .left h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .left p {
+            max-width: 320px;
+            opacity: 0.9;
+        }
+
+        /* RIGHT SIDE */
+        .right {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0f172a;
+        }
+
+        .form-box {
+            width: 360px;
+            padding: 35px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            color: white;
+            animation: slideIn 0.8s ease;
+        }
+
+        .form-box h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .form-box p {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .input-box {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .input-box i {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: gray;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            background: #1e293b;
+            color: white;
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        input:focus {
+            box-shadow: 0 0 8px #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* MOBILE */
+        @media(max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .left, .right {
+                width: 100%;
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- LEFT SIDE -->
+<div class="left">
+    <h1>🚀 AI Chatbot</h1>
+    <p>Create your account and start exploring the world of Artificial Intelligence.</p>
+</div>
+
+<!-- RIGHT SIDE -->
+<div class="right">
+    <div class="form-box">
+        <h2>Create Account</h2>
+        <p>Register to continue</p>
+
+        <!-- ERROR MESSAGE -->
+        {% if msg %}
+        <div class="error">{{ msg }}</div>
+        {% endif %}
+
+        <form method="POST">
+
+            <div class="input-box">
+                <i class="fa fa-user"></i>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="input-box">
+                <i class="fa fa-lock"></i>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p style="margin-top: 15px; text-align:center;">
+            Already have an account? <a href="/login">Login</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

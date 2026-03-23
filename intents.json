@@ -1,0 +1,75 @@
+[
+{"tag":"greeting","patterns":["hello","hi","hey","yo","hi there","good morning","good evening"],"responses":["Hello! I am your AI chatbot.","Hi there! Ask me anything about AI.","Hey! How can I help you with AI?"]},
+
+{"tag":"bye","patterns":["bye","goodbye","exit","see you","farewell"],"responses":["Goodbye! Have a great day!","See you later!","Bye! Come back for more AI knowledge."]},
+
+{"tag":"thanks","patterns":["thanks","thank you","thx","ok thanks"],"responses":["You're welcome!","Happy to help!","Anytime 😊"]},
+
+{"tag":"ai_definition","patterns":["ai","what is ai","define ai","ai meaning","artificial intelligence"],"responses":["AI stands for Artificial Intelligence. It allows machines to mimic human intelligence."]},
+
+{"tag":"ai_daily_life","patterns":["daily life","ai daily life","ai uses","ai examples","ai in life"],"responses":["AI is used in phones, maps, shopping, and assistants like Alexa or Siri."]},
+
+{"tag":"ai_education","patterns":["education","ai education","ai learning","ai in school","study ai"],"responses":["AI helps in personalized learning, smart tutoring, and automatic grading."]},
+
+{"tag":"ai_healthcare","patterns":["healthcare","ai healthcare","medical ai","hospital ai","health ai"],"responses":["AI helps doctors diagnose diseases, analyze scans, and improve treatment."]},
+
+{"tag":"ai_finance","patterns":["finance","ai finance","banking","money ai","fintech"],"responses":["AI is used in fraud detection, trading, and financial analysis."]},
+
+{"tag":"ai_transportation","patterns":["transport","transportation","cars","self driving","ai transport"],"responses":["AI powers self-driving cars, navigation systems, and traffic prediction."]},
+
+{"tag":"ai_energy","patterns":["energy","power","ai energy","electricity ai","smart grid"],"responses":["AI optimizes energy usage and supports smart grids and renewable energy."]},
+
+{"tag":"ai_agriculture","patterns":["agriculture","farming","ai farming","crops","smart farming"],"responses":["AI helps monitor crops, detect pests, and improve farming efficiency."]},
+
+{"tag":"ai_research","patterns":["research","science","ai research","data analysis","ai labs"],"responses":["AI accelerates research with simulations and data analysis."]},
+
+{"tag":"ai_space","patterns":["space","nasa","ai space","satellite","space ai"],"responses":["AI is used in space missions, navigation, and data analysis."]},
+
+{"tag":"ai_cybersecurity","patterns":["security","cybersecurity","hacking","ai security","cyber ai"],"responses":["AI detects threats and protects systems from cyber attacks."]},
+
+{"tag":"ai_entertainment","patterns":["entertainment","movies","games","music ai","ai fun"],"responses":["AI powers games, movie recommendations, and music generation."]},
+
+{"tag":"ai_sports","patterns":["sports","cricket","football","ai sports","athlete ai"],"responses":["AI helps analyze performance and prevent injuries in sports."]},
+
+{"tag":"ai_art","patterns":["art","drawing","ai art","painting","creative ai"],"responses":["AI can generate art, music, and creative content."]},
+
+{"tag":"ai_customer_service","patterns":["customer service","support","chatbot","helpdesk","ai support"],"responses":["AI chatbots help customers instantly and efficiently."]},
+
+{"tag":"ai_robotics","patterns":["robot","robotics","ai robot","machines","automation"],"responses":["AI controls robots and automates tasks in industries."]},
+
+{"tag":"ai_nlp","patterns":["nlp","language","chatbot ai","text ai","speech ai"],"responses":["AI understands human language using NLP technology."]},
+
+{"tag":"ai_computer_vision","patterns":["vision","image","photo ai","camera ai","object detection"],"responses":["AI can analyze images and detect objects using computer vision."]},
+
+{"tag":"ai_voice","patterns":["voice","speech","alexa","siri","voice assistant"],"responses":["AI powers voice assistants to understand and respond to speech."]},
+
+{"tag":"ai_ecommerce","patterns":["shopping","ecommerce","buy online","recommendation","ai shopping"],"responses":["AI recommends products and personalizes shopping experience."]},
+
+{"tag":"ai_marketing","patterns":["marketing","ads","advertising","ai ads","campaign"],"responses":["AI targets customers and optimizes marketing campaigns."]},
+
+{"tag":"ai_travel","patterns":["travel","trip","booking","ai travel","tourism"],"responses":["AI helps plan trips and manage bookings efficiently."]},
+
+{"tag":"ai_food","patterns":["food","restaurant","ai food","menu ai","kitchen ai"],"responses":["AI helps optimize menus and automate food services."]},
+
+{"tag":"ai_logistics","patterns":["logistics","delivery","supply chain","warehouse","ai delivery"],"responses":["AI improves delivery speed and supply chain efficiency."]},
+
+{"tag":"ai_smart_cities","patterns":["smart city","city","traffic","urban ai","city planning"],"responses":["AI manages traffic and improves city infrastructure."]},
+
+{"tag":"ai_virtual_reality","patterns":["vr","virtual reality","ai vr","gaming vr","virtual world"],"responses":["AI enhances virtual reality experiences."]},
+
+{"tag":"ai_iot","patterns":["iot","devices","smart home","connected devices","ai iot"],"responses":["AI connects devices and automates smart environments."]},
+
+{"tag":"ai_prediction","patterns":["prediction","forecast","future ai","trend ai","analytics"],"responses":["AI predicts trends and future outcomes using data."]},
+
+{"tag":"ai_chatbots","patterns":["chatbot","ai chatbot","bot","virtual assistant","ai chat"],"responses":["AI chatbots simulate conversations and help users."]},
+
+{"tag":"ai_deep_learning","patterns":["deep learning","neural network","ai model","training ai"],"responses":["Deep learning helps AI learn complex patterns from data."]},
+
+{"tag":"ai_image","patterns":["image","generate image","ai image","picture ai","deepfake"],"responses":["AI can generate realistic images and visuals."]},
+
+{"tag":"ai_text","patterns":["text","write ai","ai writing","content ai","generate text"],"responses":["AI can generate articles, stories, and content."]},
+
+{"tag":"ai_weather","patterns":["weather","forecast","climate","ai weather","storm prediction"],"responses":["AI predicts weather using historical data."]},
+
+{"tag":"ai_emergency","patterns":["emergency","disaster","rescue","ai emergency","crisis"],"responses":["AI helps in disaster prediction and rescue planning."]}
+]
