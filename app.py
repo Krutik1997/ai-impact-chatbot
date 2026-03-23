@@ -28,9 +28,9 @@ chatbot_active = True   # 🔥 ADMIN CONTROL
 # ---------------------
 # TEMPLATES
 # ---------------------
-import pathlib
-BASE_DIR = pathlib.Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory="templates")
 
 # ---------------------
 # STATIC FILES
@@ -256,7 +256,10 @@ def clear_chats():
 # ---------------------
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request, "msg": ""})
+    return templates.TemplateResponse("login.html", {
+    "request": request,
+    "msg": ""
+})
 
 @app.post("/login", response_class=HTMLResponse)
 def login(request: Request, username: str = Form(...), password: str = Form(...)):
