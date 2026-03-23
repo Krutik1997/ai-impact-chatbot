@@ -16,7 +16,12 @@ import json
 import os
 import random
 from typing import List, Dict, Any
+
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY not set in environment")
 
 app = FastAPI()
 
