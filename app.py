@@ -20,8 +20,7 @@ from typing import List, Dict, Any
 
 secret_key = os.environ.get("SECRET_KEY")
 
-if not secret_key:
-    raise ValueError("secret_key not set in environment")
+SECRET_KEY = os.environ.get("SECRET_KEY","dev-secret-key")
 
 app = FastAPI()
 
