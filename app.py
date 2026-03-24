@@ -18,17 +18,16 @@ import random
 from typing import List, Dict, Any
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+secret_key = os.environ.get("SECRET_KEY")
 
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY not set in environment")
+if not secret_key:
+    raise ValueError("secret_key not set in environment")
 
 app = FastAPI()
 
 # ---------------------
 # GLOBAL CONTROL
 # ---------------------
-chatbot_active = True   # 🔥 ADMIN CONTROL
 
 # ---------------------
 # TEMPLATES
@@ -140,55 +139,6 @@ def get_response(user_msg: str) -> str:
 def home():
     return RedirectResponse("/login")
 
-# ---------------------
-# ADMIN PANEL
-# ---------------------
-@app.get("/admin", response_class=HTMLResponse)
-def admin_panel(request: Request):
-    request.session["user"] = username
-    user = request.session.get("user")
-    request.session.clear()
-
-    if user != "admin":
-        return RedirectResponse("/login")
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    # 🔥 USER ANALYTICS
-    cursor.execute("""
-    SELECT users.rowid, users.username, COUNT(chat_history.id)
-    FROM users
-    LEFT JOIN chat_history ON users.username = chat_history.username
-    GROUP BY users.username
-    """)
-    users = cursor.fetchall()
-
-    cursor.execute("SELECT id, username, sender, message, time FROM chat_history ORDER BY id DESC")
-    chats = cursor.fetchall()
-
-    conn.close()
-
-    return templates.TemplateResponse("admin.html", {
-        "request": request,
-        "users": users,
-        "chats": chats,
-        "bot_status": chatbot_active
-    })
-
-# ---------------------
-# TOGGLE CHATBOT
-# ---------------------
-@app.get("/toggle_bot")
-def toggle_bot(request: Request):
-    global chatbot_active
-
-    user = request.cookies.get("user")
-    if user != "admin":
-        return JSONResponse({"error": "Unauthorized"}, status_code=403)
-
-    chatbot_active = not chatbot_active
-    return {"status": chatbot_active}
 
 # ---------------------
 # INTENT API
@@ -206,55 +156,6 @@ async def update_intents(request: Request):
 
     load_intents()
     return {"status": "updated"}
-
-# ---------------------
-# DELETE USER
-# ---------------------
-@app.get("/delete_user/{user_id}")
-def delete_user(user_id: int):
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT username FROM users WHERE rowid=?", (user_id,))
-    row = cursor.fetchone()
-
-    if row:
-        username = row[0]
-        cursor.execute("DELETE FROM chat_history WHERE username=?", (username,))
-        cursor.execute("DELETE FROM users WHERE rowid=?", (user_id,))
-
-    conn.commit()
-    conn.close()
-
-    return RedirectResponse("/admin", status_code=303)
-
-# ---------------------
-# DELETE CHAT
-# ---------------------
-@app.get("/delete_chat/{chat_id}")
-def delete_chat(chat_id: int):
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM chat_history WHERE id=?", (chat_id,))
-    conn.commit()
-    conn.close()
-
-    return RedirectResponse("/admin", status_code=303)
-
-# ---------------------
-# CLEAR CHATS
-# ---------------------
-@app.get("/clear_chats")
-def clear_chats():
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM chat_history")
-    conn.commit()
-    conn.close()
-
-    return RedirectResponse("/admin", status_code=303)
 
 # ---------------------
 # LOGIN
