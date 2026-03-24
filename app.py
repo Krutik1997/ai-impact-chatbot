@@ -1,6 +1,5 @@
+chatbot_active = True
 import secrets
-
-SECRET_KEY = secrets.token_hex(32)
 
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
@@ -17,9 +16,6 @@ import os
 import random
 from typing import List, Dict, Any
 
-
-secret_key = os.environ.get("SECRET_KEY")
-
 SECRET_KEY = os.environ.get("SECRET_KEY","dev-secret-key")
 
 app = FastAPI()
@@ -33,13 +29,13 @@ app = FastAPI()
 # ---------------------
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 # ---------------------
 # STATIC FILES
 # ---------------------
-if os.path.exists("static"):
-    app.mount("/static", StaticFiles(directory="static"), name="static")
+if (BASE_DIR / "static").exists():
+    app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 # ---------------------
 # DATABASE
