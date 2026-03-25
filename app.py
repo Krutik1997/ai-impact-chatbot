@@ -41,8 +41,7 @@ if (BASE_DIR / "static").exists():
 # DATABASE
 # ---------------------
 def get_db():
-    conn = sqlite3.connect("chatbot.db")
-    return conn
+    return sqlite3.connect("chatbot.db", check_same_thread=False)
 
 def init_db():
     conn = get_db()
@@ -255,6 +254,105 @@ def chat(request: Request, message: str = Form(...)):
     conn.close()
 
     return RedirectResponse("/chat", status_code=303)
+
+
+#---------------------
+# ADMIN PAGE
+#---------------------
+@app.get("/admin", response_class=HTMLResponse)
+def admin_page(request: Request):
+    user = request.cookies.get("user")
+
+    # 🔐 Only admin allowed
+    if user != "admin":
+        return RedirectResponse("/login")
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # 👥 Users with chat count
+    cursor.execute("""
+        SELECT u.rowid, u.username, COUNT(c.id)
+        FROM users u
+        LEFT JOIN chat_history c ON u.username = c.username
+        GROUP BY u.username
+    """)
+    users = cursor.fetchall()
+
+    # 💬 All chats
+    cursor.execute("""
+        SELECT id, username, sender, message, time
+        FROM chat_history
+        ORDER BY id DESC
+    """)
+    chats = cursor.fetchall()
+
+    conn.close()
+
+    return templates.TemplateResponse(
+        "admin.html",
+        {
+            "request": request,
+            "users": users,
+            "chats": chats,
+            "bot_status": chatbot_active
+        }
+    )
+    
+#---------------------
+# TOGGLE CHATBOT
+#---------------------
+@app.get("/toggle_bot")
+def toggle_bot():
+    global chatbot_active
+    chatbot_active = not chatbot_active
+    return {"status": chatbot_active}
+ 
+#---------------------
+# DELETE USER
+#---------------------
+@app.get("/delete_user/{user_id}")
+def delete_user(user_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM users WHERE rowid=?", (user_id,))
+    cursor.execute("DELETE FROM chat_history WHERE username NOT IN (SELECT username FROM users)")
+
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse("/admin", status_code=303)
+
+#---------------------
+# DELETE CHAT
+#---------------------
+@app.get("/delete_chat/{chat_id}")
+def delete_chat(chat_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM chat_history WHERE id=?", (chat_id,))
+
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse("/admin", status_code=303)
+
+#---------------------
+# CLEAR CHAT HISTORY
+#---------------------
+@app.get("/clear_chats")
+def clear_chats():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM chat_history")
+
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse("/admin", status_code=303)
 
 # ---------------------
 # LOGOUT
