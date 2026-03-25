@@ -22,8 +22,7 @@ app = FastAPI()
 import psycopg2
 import os
 
-DATABASE_URL = os.environ.get("postgresql://postgres:gofYAXdYELOISuHepnobhXYKFisDNVRg@postgres.railway.internal:5432/railway")
-
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
 # ---------------------
@@ -48,8 +47,8 @@ if (BASE_DIR / "static").exists():
 # ---------------------
 
 def get_db():
-    return psycopg2.connect("postgresql://postgres:gofYAXdYELOISuHepnobhXYKFisDNVRg@postgres.railway.internal:5432/railway")
-
+    return psycopg2.connect(DATABASE_URL)
+    
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
@@ -229,49 +228,44 @@ def chat_page(request: Request):
         "chat_history": chats
     })
 
-@app.post("/chat", response_class=HTMLResponse)
-def chat(request: Request, message: str = Form(...)):
+@app.post("/chat")
+async def chat(request: Request):
     global chatbot_active
 
+    data = await request.json()
+    message = data.get("message")
+
     user = request.cookies.get("user")
-    print("User:", user)
-    print("Message:", message)
 
     if not user:
-        print("No user found")
-        return RedirectResponse("/login")
+        return {"reply": "Please login first"}
 
     if not chatbot_active:
-        print("Bot is OFF")
-        return RedirectResponse("/chat", status_code=303)
+        return {"reply": "Bot is currently OFF"}
 
     conn = get_db()
     cursor = conn.cursor()
 
     time = datetime.now().strftime("%H:%M")
 
-    # Save user message
+    # save user msg
     cursor.execute(
         "INSERT INTO chat_history (username, sender, message, time) VALUES (%s, %s, %s, %s)",
         (user, "user", message, time)
     )
 
-    # Get bot reply
+    # bot reply
     reply = get_response(message)
-    print("Bot reply:", reply)
 
-    # Save bot reply
     cursor.execute(
         "INSERT INTO chat_history (username, sender, message, time) VALUES (%s, %s, %s, %s)",
         (user, "bot", reply, time)
     )
 
     conn.commit()
-    print("✅ Chat saved successfully")
     conn.close()
 
-    return RedirectResponse("/chat", status_code=303)
-
+    return {"reply": reply}
 
 #---------------------
 # ADMIN PAGE
@@ -289,7 +283,7 @@ def admin_page(request: Request):
 
     # 👥 Users with chat count
     cursor.execute("""
-        SELECT u.rowid, u.username, COUNT(c.id)
+        SELECT u.username, COUNT(c.id)
         FROM users u
         LEFT JOIN chat_history c ON u.username = c.username
         GROUP BY u.username
@@ -333,7 +327,7 @@ def delete_user(user_id: int):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM users WHERE rowid=%s", (user_id,))
+    cursor.execute("DELETE FROM users WHERE username=%s", (user_id,))
     cursor.execute("DELETE FROM chat_history WHERE username NOT IN (SELECT username FROM users)")
 
     conn.commit()
