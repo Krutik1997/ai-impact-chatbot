@@ -22,10 +22,9 @@ app = FastAPI()
 import psycopg2
 import os
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("postgresql://postgres:gofYAXdYELOISuHepnobhXYKFisDNVRg@postgres.railway.internal:5432/railway")
 
-def get_db():
-    return psycopg2.connect(DATABASE_URL)
+
 
 # ---------------------
 # GLOBAL CONTROL
@@ -47,10 +46,9 @@ if (BASE_DIR / "static").exists():
 # ---------------------
 # DATABASE
 # ---------------------
-DB_PATH = os.path.join(os.getcwd(), "chatbot.db")
 
 def get_db():
-    return sqlite3.connect(DB_PATH, check_same_thread=False)
+    return psycopg2.connect(postgresql://postgres:gofYAXdYELOISuHepnobhXYKFisDNVRg@postgres.railway.internal:5432/railway)
 
 def init_db():
     conn = get_db()
