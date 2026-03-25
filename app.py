@@ -40,8 +40,10 @@ if (BASE_DIR / "static").exists():
 # ---------------------
 # DATABASE
 # ---------------------
+DB_PATH = os.path.join(os.getcwd(), "chatbot.db")
+
 def get_db():
-    return sqlite3.connect("chatbot.db", check_same_thread=False)
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
 
 def init_db():
     conn = get_db()
@@ -227,10 +229,15 @@ def chat(request: Request, message: str = Form(...)):
     global chatbot_active
 
     user = request.cookies.get("user")
+    print("User:", user)
+    print("Message:", message)
+
     if not user:
+        print("No user found")
         return RedirectResponse("/login")
 
     if not chatbot_active:
+        print("Bot is OFF")
         return RedirectResponse("/chat", status_code=303)
 
     conn = get_db()
@@ -238,19 +245,24 @@ def chat(request: Request, message: str = Form(...)):
 
     time = datetime.now().strftime("%H:%M")
 
+    # Save user message
     cursor.execute(
         "INSERT INTO chat_history (username, sender, message, time) VALUES (?, ?, ?, ?)",
         (user, "user", message, time)
     )
 
+    # Get bot reply
     reply = get_response(message)
+    print("Bot reply:", reply)
 
+    # Save bot reply
     cursor.execute(
         "INSERT INTO chat_history (username, sender, message, time) VALUES (?, ?, ?, ?)",
         (user, "bot", reply, time)
     )
 
     conn.commit()
+    print("✅ Chat saved successfully")
     conn.close()
 
     return RedirectResponse("/chat", status_code=303)
