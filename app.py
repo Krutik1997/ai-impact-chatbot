@@ -29,7 +29,7 @@ app = FastAPI()
 # ---------------------
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=BASE_DIR / "templates")
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 # ---------------------
 # STATIC FILES
