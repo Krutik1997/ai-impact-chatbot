@@ -6,7 +6,6 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-import sqlite3
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from rapidfuzz import fuzz
@@ -19,6 +18,14 @@ from typing import List, Dict, Any
 SECRET_KEY = os.environ.get("SECRET_KEY","dev-secret-key")
 
 app = FastAPI()
+
+import psycopg2
+import os
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+def get_db():
+    return psycopg2.connect(DATABASE_URL)
 
 # ---------------------
 # GLOBAL CONTROL
@@ -58,7 +65,7 @@ def init_db():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS chat_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         username TEXT,
         sender TEXT,
         message TEXT,
@@ -168,7 +175,7 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT password FROM users WHERE username=?", (username,))
+    cursor.execute("SELECT password FROM users WHERE username=%s", (username,))
     data = cursor.fetchone()
     conn.close()
 
@@ -191,11 +198,11 @@ def register(request: Request, username: str = Form(...), password: str = Form(.
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM users WHERE username=?", (username,))
+    cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
     if cursor.fetchone():
         return templates.TemplateResponse("register.html", {"request": request, "msg": "User exists"})
 
-    cursor.execute("INSERT INTO users VALUES (?, ?)", (username, generate_password_hash(password)))
+    cursor.execute("INSERT INTO users VALUES (%s, %s)", (username, generate_password_hash(password)))
     conn.commit()
     conn.close()
 
@@ -215,7 +222,7 @@ def chat_page(request: Request):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT sender, message, time FROM chat_history WHERE username=?", (user,))
+    cursor.execute("SELECT sender, message, time FROM chat_history WHERE username=%s", (user,))
     chats = cursor.fetchall()
     conn.close()
 
@@ -247,7 +254,7 @@ def chat(request: Request, message: str = Form(...)):
 
     # Save user message
     cursor.execute(
-        "INSERT INTO chat_history (username, sender, message, time) VALUES (?, ?, ?, ?)",
+        "INSERT INTO chat_history (username, sender, message, time) VALUES (%s, %s, %s, %s)",
         (user, "user", message, time)
     )
 
@@ -257,7 +264,7 @@ def chat(request: Request, message: str = Form(...)):
 
     # Save bot reply
     cursor.execute(
-        "INSERT INTO chat_history (username, sender, message, time) VALUES (?, ?, ?, ?)",
+        "INSERT INTO chat_history (username, sender, message, time) VALUES (%s, %s, %s, %s)",
         (user, "bot", reply, time)
     )
 
@@ -328,7 +335,7 @@ def delete_user(user_id: int):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM users WHERE rowid=?", (user_id,))
+    cursor.execute("DELETE FROM users WHERE rowid=%s", (user_id,))
     cursor.execute("DELETE FROM chat_history WHERE username NOT IN (SELECT username FROM users)")
 
     conn.commit()
@@ -344,7 +351,7 @@ def delete_chat(chat_id: int):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM chat_history WHERE id=?", (chat_id,))
+    cursor.execute("DELETE FROM chat_history WHERE id=%s", (chat_id,))
 
     conn.commit()
     conn.close()
