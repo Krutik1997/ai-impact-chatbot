@@ -48,7 +48,7 @@ if (BASE_DIR / "static").exists():
 # ---------------------
 
 def get_db():
-    return psycopg2.connect(postgresql://postgres:gofYAXdYELOISuHepnobhXYKFisDNVRg@postgres.railway.internal:5432/railway)
+    return psycopg2.connect("postgresql://postgres:gofYAXdYELOISuHepnobhXYKFisDNVRg@postgres.railway.internal:5432/railway")
 
 def init_db():
     conn = get_db()
