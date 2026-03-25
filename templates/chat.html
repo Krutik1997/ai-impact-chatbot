@@ -1,29 +1,38 @@
 <!DOCTYPE html><html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chatbot Pro</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"><style>
+<title>AI Chatbot Ultra</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
 
+/* ANIMATED BACKGROUND */
 body{
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(135deg,#74ebd5,#ACB6E5);
+    background:linear-gradient(-45deg,#667eea,#764ba2,#6dd5ed,#2193b0);
+    background-size:400% 400%;
+    animation:bg 10s ease infinite;
 }
 
-/* MAIN PANEL */
+@keyframes bg{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* CHAT PANEL */
 .chat-wrapper{
     width:100%;
-    max-width:520px;
+    max-width:550px;
     height:92vh;
     display:flex;
     flex-direction:column;
     border-radius:25px;
     overflow:hidden;
-    background:rgba(255,255,255,0.15);
-    backdrop-filter:blur(25px);
-    box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    background:rgba(255,255,255,0.2);
+    backdrop-filter:blur(30px);
+    box-shadow:0 25px 80px rgba(0,0,0,0.3);
 }
 
 /* HEADER */
@@ -33,12 +42,12 @@ body{
     justify-content:space-between;
     align-items:center;
     padding:0 20px;
-    background:rgba(255,255,255,0.2);
-    backdrop-filter:blur(15px);
+    background:rgba(255,255,255,0.25);
+    backdrop-filter:blur(20px);
     font-weight:600;
 }
 
-/* CHAT AREA */
+/* CHAT */
 .chat-box{
     flex:1;
     overflow-y:auto;
@@ -50,7 +59,7 @@ body{
 /* MESSAGE */
 .message{
     max-width:75%;
-    margin:8px 0;
+    margin:10px 0;
     animation:fade 0.3s ease;
 }
 
@@ -73,12 +82,19 @@ body{
     color:#333;
 }
 
+/* TIME */
+.time{
+    font-size:10px;
+    opacity:0.6;
+    margin-top:3px;
+}
+
 /* INPUT */
 .input-area{
     display:flex;
     padding:12px;
-    background:rgba(255,255,255,0.2);
-    backdrop-filter:blur(15px);
+    background:rgba(255,255,255,0.25);
+    backdrop-filter:blur(20px);
 }
 
 input{
@@ -87,13 +103,12 @@ input{
     border-radius:25px;
     border:none;
     outline:none;
-    font-size:14px;
 }
 
 button{
     margin-left:10px;
-    width:48px;
-    height:48px;
+    width:50px;
+    height:50px;
     border-radius:50%;
     border:none;
     background:linear-gradient(135deg,#667eea,#764ba2);
@@ -103,81 +118,127 @@ button{
 }
 
 button:hover{
-    transform:scale(1.1);
+    transform:scale(1.1) rotate(10deg);
 }
 
-/* SCROLL */
-.chat-box::-webkit-scrollbar{
-    width:5px;
+/* TYPING */
+.typing span{
+    display:inline-block;
+    width:6px;
+    height:6px;
+    margin:2px;
+    background:#999;
+    border-radius:50%;
+    animation:blink 1.4s infinite;
 }
-.chat-box::-webkit-scrollbar-thumb{
-    background:#888;
-    border-radius:10px;
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+
+@keyframes blink{
+    0%,80%,100%{opacity:0;}
+    40%{opacity:1;}
 }
 
-/* ANIMATION */
+/* FADE */
 @keyframes fade{
     from{opacity:0;transform:translateY(10px);}
     to{opacity:1;transform:translateY(0);}
 }
-</style></head><body><div class="chat-wrapper"><!-- HEADER --><div class="header">
-    <div>🤖 AI Assistant</div>
+</style></head><body><div class="chat-wrapper"><div class="header">
+    <div>🤖 AI Impact Chatbot</div>
     <a href="/logout" style="color:red;text-decoration:none;">Logout</a>
-</div><!-- CHAT --><div class="chat-box" id="chatBox">
+</div><div class="chat-box" id="chatBox">
     {% for sender, message, time in chat_history %}
     <div class="message {{sender}}">
         <div class="bubble">{{message}}</div>
+        <div class="time">{{time}}</div>
     </div>
     {% endfor %}
-</div><!-- INPUT --><div class="input-area">
-    <input id="msgInput" placeholder="Type your message..." autocomplete="off">
+</div><div class="input-area">
+    <input id="msgInput" placeholder="Ask anything..." autocomplete="off">
     <button id="sendBtn">➤</button>
 </div></div><script>
 const box = document.getElementById("chatBox");
 const input = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
+const btn = document.getElementById("sendBtn");
 
-// SCROLL
-function scrollBottom(){
-    box.scrollTop = box.scrollHeight;
+// TIME
+function getTime(){
+    let d=new Date();
+    return d.getHours()+":"+d.getMinutes().toString().padStart(2,'0');
 }
 
 // ADD MESSAGE
-function addMessage(text, sender){
-    let div = document.createElement("div");
-    div.className = "message " + sender;
-    div.innerHTML = `<div class="bubble">${text}</div>`;
+function addMessage(text,sender){
+    let div=document.createElement("div");
+    div.className="message "+sender;
+    div.innerHTML=`<div class="bubble">${text}</div>
+                   <div class="time">${getTime()}</div>`;
     box.appendChild(div);
-    scrollBottom();
+    box.scrollTop=box.scrollHeight;
+}
+
+// TYPE EFFECT
+function typeEffect(text){
+    let i=0;
+    let div=document.createElement("div");
+    div.className="message bot";
+    div.innerHTML=`<div class="bubble"></div><div class="time">${getTime()}</div>`;
+    box.appendChild(div);
+
+    let bubble=div.querySelector(".bubble");
+
+    let interval=setInterval(()=>{
+        bubble.innerHTML+=text.charAt(i);
+        i++;
+        box.scrollTop=box.scrollHeight;
+        if(i>=text.length) clearInterval(interval);
+    },15);
 }
 
 // SEND
 async function sendMessage(){
-    let msg = input.value.trim();
+    let msg=input.value.trim();
     if(!msg) return;
 
     addMessage(msg,"user");
     input.value="";
 
-    await fetch("/chat",{
-        method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body:"message="+encodeURIComponent(msg)
-    });
+    // typing
+    let typing=document.createElement("div");
+    typing.className="message bot";
+    typing.innerHTML=`<div class="bubble typing">
+    <span></span><span></span><span></span></div>`;
+    box.appendChild(typing);
 
-    location.reload();
+    try{
+        let res=await fetch("/chat",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({message:msg})
+        });
+
+        let data=await res.json();
+        typing.remove();
+
+        typeEffect(data.reply);
+
+    }catch{
+        typing.remove();
+        addMessage("Server error","bot");
+    }
 }
 
 // EVENTS
-sendBtn.onclick = sendMessage;
+btn.onclick=sendMessage;
 
-input.addEventListener("keydown",function(e){
+input.addEventListener("keydown",e=>{
     if(e.key==="Enter"){
         e.preventDefault();
         sendMessage();
     }
 });
 
-window.onload = scrollBottom;
+window.onload=()=>box.scrollTop=box.scrollHeight;
 </script></body>
 </html>
