@@ -1,244 +1,179 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chatbot Ultra</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"><style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+    <title>AI Impact Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* ANIMATED BACKGROUND */
-body{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(-45deg,#667eea,#764ba2,#6dd5ed,#2193b0);
-    background-size:400% 400%;
-    animation:bg 10s ease infinite;
-}
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-@keyframes bg{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
-}
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg,#dfe9f3,#ffffff);
+        }
 
-/* CHAT PANEL */
-.chat-wrapper{
-    width:100%;
-    max-width:550px;
-    height:92vh;
-    display:flex;
-    flex-direction:column;
-    border-radius:25px;
-    overflow:hidden;
-    background:rgba(255,255,255,0.2);
-    backdrop-filter:blur(30px);
-    box-shadow:0 25px 80px rgba(0,0,0,0.3);
-}
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
-/* HEADER */
-.header{
-    height:65px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 20px;
-    background:rgba(255,255,255,0.25);
-    backdrop-filter:blur(20px);
-    font-weight:600;
-}
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 14px 18px;
+            font-weight: 600;
+            font-size: 16px;
+            backdrop-filter: blur(15px);
+            background: rgba(255,255,255,0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
 
-/* CHAT */
-.chat-box{
-    flex:1;
-    overflow-y:auto;
-    padding:15px;
-    display:flex;
-    flex-direction:column;
-}
+        /* CHAT */
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            padding-bottom: 90px;
+        }
 
-/* MESSAGE */
-.message{
-    max-width:75%;
-    margin:10px 0;
-    animation:fade 0.3s ease;
-}
+        .message {
+            max-width: 75%;
+            margin: 6px 0;
+        }
 
-.user{align-self:flex-end;}
-.bot{align-self:flex-start;}
+        .user {
+            align-self: flex-end;
+        }
 
-.bubble{
-    padding:12px 16px;
-    border-radius:18px;
-    font-size:14px;
-}
+        .bot {
+            align-self: flex-start;
+        }
 
-.user .bubble{
-    background:linear-gradient(135deg,#667eea,#764ba2);
-    color:white;
-}
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
 
-.bot .bubble{
-    background:white;
-    color:#333;
-}
+        .user .bubble {
+            background: linear-gradient(135deg,#6a11cb,#2575fc);
+            color: white;
+        }
 
-/* TIME */
-.time{
-    font-size:10px;
-    opacity:0.6;
-    margin-top:3px;
-}
+        .bot .bubble {
+            background: #ffffff;
+            color: #333;
+        }
 
-/* INPUT */
-.input-area{
-    display:flex;
-    padding:12px;
-    background:rgba(255,255,255,0.25);
-    backdrop-filter:blur(20px);
-}
+        .time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
 
-input{
-    flex:1;
-    padding:12px;
-    border-radius:25px;
-    border:none;
-    outline:none;
-}
+        /* INPUT */
+        .input-area {
+            position: sticky;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
 
-button{
-    margin-left:10px;
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    border:none;
-    background:linear-gradient(135deg,#667eea,#764ba2);
-    color:white;
-    cursor:pointer;
-    transition:0.3s;
-}
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            background: #f1f5f9;
+        }
 
-button:hover{
-    transform:scale(1.1) rotate(10deg);
-}
+        button {
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg,#6a11cb,#2575fc);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
-/* TYPING */
-.typing span{
-    display:inline-block;
-    width:6px;
-    height:6px;
-    margin:2px;
-    background:#999;
-    border-radius:50%;
-    animation:blink 1.4s infinite;
-}
-.typing span:nth-child(2){animation-delay:.2s;}
-.typing span:nth-child(3){animation-delay:.4s;}
+    </style>
+</head>
 
-@keyframes blink{
-    0%,80%,100%{opacity:0;}
-    40%{opacity:1;}
-}
+<body>
 
-/* FADE */
-@keyframes fade{
-    from{opacity:0;transform:translateY(10px);}
-    to{opacity:1;transform:translateY(0);}
-}
-</style></head><body><div class="chat-wrapper"><div class="header">
-    <div>🤖 AI Impact Chatbot</div>
-    <a href="/logout" style="color:red;text-decoration:none;">Logout</a>
-</div><div class="chat-box" id="chatBox">
-    {% for sender, message, time in chat_history %}
-    <div class="message {{sender}}">
-        <div class="bubble">{{message}}</div>
-        <div class="time">{{time}}</div>
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div>🤖 AI Impact Chatbot</div>
+        <a href="/logout" style="color:#ff4d4d;">Logout</a>
     </div>
-    {% endfor %}
-</div><div class="input-area">
-    <input id="msgInput" placeholder="Ask anything..." autocomplete="off">
-    <button id="sendBtn">➤</button>
-</div></div><script>
-const box = document.getElementById("chatBox");
+
+    <!-- CHAT -->
+    <div class="chat-box" id="chatBox">
+
+        {% for sender, message, time in chat_history %}
+            <div class="message {{ sender }}">
+                <div class="bubble">{{ message }}</div>
+                <div class="time">{{ time }}</div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- INPUT -->
+    <form class="input-area" method="POST" action="/chat">
+        <input id="msgInput" name="message" placeholder="Type a message..." required>
+        <button type="submit">➤</button>
+    </form>
+
+</div>
+
+<script>
+const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("msgInput");
-const btn = document.getElementById("sendBtn");
 
-// TIME
-function getTime(){
-    let d=new Date();
-    return d.getHours()+":"+d.getMinutes().toString().padStart(2,'0');
-}
+/* AUTO SCROLL */
+window.onload = () => {
+    chatBox.scrollTop = chatBox.scrollHeight;
+};
 
-// ADD MESSAGE
-function addMessage(text,sender){
-    let div=document.createElement("div");
-    div.className="message "+sender;
-    div.innerHTML=`<div class="bubble">${text}</div>
-                   <div class="time">${getTime()}</div>`;
-    box.appendChild(div);
-    box.scrollTop=box.scrollHeight;
-}
-
-// TYPE EFFECT
-function typeEffect(text){
-    let i=0;
-    let div=document.createElement("div");
-    div.className="message bot";
-    div.innerHTML=`<div class="bubble"></div><div class="time">${getTime()}</div>`;
-    box.appendChild(div);
-
-    let bubble=div.querySelector(".bubble");
-
-    let interval=setInterval(()=>{
-        bubble.innerHTML+=text.charAt(i);
-        i++;
-        box.scrollTop=box.scrollHeight;
-        if(i>=text.length) clearInterval(interval);
-    },15);
-}
-
-// SEND
-async function sendMessage(){
-    let msg=input.value.trim();
-    if(!msg) return;
-
-    addMessage(msg,"user");
-    input.value="";
-
-    // typing
-    let typing=document.createElement("div");
-    typing.className="message bot";
-    typing.innerHTML=`<div class="bubble typing">
-    <span></span><span></span><span></span></div>`;
-    box.appendChild(typing);
-
-    try{
-        let res=await fetch("/chat",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({message:msg})
-        });
-
-        let data=await res.json();
-        typing.remove();
-
-        typeEffect(data.reply);
-
-    }catch{
-        typing.remove();
-        addMessage("Server error","bot");
-    }
-}
-
-// EVENTS
-btn.onclick=sendMessage;
-
-input.addEventListener("keydown",e=>{
-    if(e.key==="Enter"){
-        e.preventDefault();
-        sendMessage();
-    }
+/* FIX MOBILE KEYBOARD */
+input.addEventListener("focus", () => {
+    setTimeout(() => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 300);
 });
 
-window.onload=()=>box.scrollTop=box.scrollHeight;
-</script></body>
+/* ENTER KEY FIX */
+input.addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        e.preventDefault();
+        this.form.submit();
+    }
+});
+</script>
+
+</body>
 </html>
