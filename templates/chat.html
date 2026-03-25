@@ -1,68 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <title>AI Chatbot</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- Fonts & Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-    * { box-sizing: border-box; }
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
 
     html, body {
         margin: 0;
-        padding: 0;
         height: 100%;
         font-family: 'Poppins', sans-serif;
-        background: radial-gradient(circle at top, #020617, #0f172a, #020617);
+        background: #0f172a;
     }
 
-    /* BACKGROUND GLOW */
-    body::before, body::after {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(120px);
-        z-index: 0;
+    /* APP WRAPPER (DESKTOP CENTERING) */
+    .app {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    body::before {
-        width: 300px;
-        height: 300px;
-        background: #00c6ff;
-        top: -80px;
-        left: -80px;
-    }
-
-    body::after {
-        width: 300px;
-        height: 300px;
-        background: #ff00c8;
-        bottom: -80px;
-        right: -80px;
-    }
-
-    /* CONTAINER */
+    /* MAIN CHAT CONTAINER */
     .chat-container {
         width: 100%;
+        max-width: 480px;
         height: 100vh;
         display: flex;
         flex-direction: column;
-        background: rgba(255,255,255,0.05);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(180deg, #0f172a, #020617);
         position: relative;
-        z-index: 1;
+        overflow: hidden;
+    }
+
+    /* DESKTOP MODE */
+    @media (min-width: 768px) {
+        .chat-container {
+            height: 92vh;
+            border-radius: 20px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+        }
     }
 
     /* HEADER */
     .header {
-        padding: 15px;
+        padding: 14px 16px;
         color: white;
         display: flex;
         justify-content: space-between;
         align-items: center;
         background: rgba(255,255,255,0.05);
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
         position: sticky;
         top: 0;
         z-index: 10;
@@ -71,18 +65,24 @@
     .header-left {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .avatar {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: linear-gradient(45deg, #00c6ff, #0072ff);
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
         font-size: 18px;
+        box-shadow: 0 0 10px rgba(0,198,255,0.5);
+    }
+
+    .title {
+        font-size: 15px;
+        font-weight: 500;
     }
 
     .status {
@@ -90,14 +90,9 @@
         color: #00ffae;
     }
 
-    .header i {
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .header i:hover {
-        color: #00c6ff;
-        transform: scale(1.2);
+    .logout {
+        color: #ff4d4d;
+        font-size: 18px;
     }
 
     /* CHAT AREA */
@@ -107,78 +102,86 @@
         padding: 15px;
         display: flex;
         flex-direction: column;
+        gap: 6px;
     }
 
     /* MESSAGE */
     .message {
         max-width: 75%;
-        margin: 8px 0;
-        animation: fadeIn 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.25s ease;
     }
 
     .user { align-self: flex-end; }
     .bot { align-self: flex-start; }
 
     .bubble {
-        padding: 12px 16px;
-        border-radius: 18px;
+        padding: 12px 15px;
+        border-radius: 16px;
         font-size: 14px;
-        word-wrap: break-word;
+        line-height: 1.4;
     }
 
     .user .bubble {
-        background: linear-gradient(45deg, #00c6ff, #0072ff);
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
         color: white;
         border-bottom-right-radius: 5px;
     }
 
     .bot .bubble {
-        background: rgba(255,255,255,0.9);
-        color: black;
+        background: rgba(255,255,255,0.92);
+        color: #111;
         border-bottom-left-radius: 5px;
     }
 
     .time {
         font-size: 10px;
-        opacity: 0.6;
+        opacity: 0.5;
         margin-top: 3px;
     }
 
     /* INPUT */
     .input-area {
         display: flex;
+        align-items: center;
         padding: 10px;
         background: rgba(255,255,255,0.05);
-        border-top: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255,255,255,0.08);
         position: sticky;
         bottom: 0;
-        z-index: 10;
     }
 
     input {
         flex: 1;
-        padding: 12px;
+        padding: 12px 15px;
         border-radius: 25px;
         border: none;
         outline: none;
-        background: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.08);
         color: white;
-        font-size: 16px;
+        font-size: 15px;
     }
 
     input::placeholder {
-        color: #ccc;
+        color: #aaa;
     }
 
     button {
-        margin-left: 10px;
-        width: 45px;
-        height: 45px;
+        margin-left: 8px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         border: none;
-        background: linear-gradient(45deg, #00c6ff, #0072ff);
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
         color: white;
+        font-size: 16px;
         cursor: pointer;
+    }
+
+    button:active {
+        transform: scale(0.95);
     }
 
     /* SCROLL */
@@ -188,28 +191,28 @@
 
     .chat-box::-webkit-scrollbar-thumb {
         background: #00c6ff;
-        border-radius: 10px;
     }
 
     /* ANIMATION */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
 </style>
 
-</head><body><div class="chat-container"><!-- HEADER -->
+</head><body><div class="app">
+<div class="chat-container"><!-- HEADER -->
 <div class="header">
     <div class="header-left">
         <div class="avatar">🤖</div>
         <div>
-            AI Impact Chatbot <br>
-            <span class="status">● Online</span>
+            <div class="title">AI Impact Chatbot</div>
+            <div class="status">● Online</div>
         </div>
     </div>
 
-    <a href="/logout" style="color:red;">
+    <a href="/logout" class="logout">
         <i class="fa fa-sign-out-alt"></i>
     </a>
 </div>
@@ -226,10 +229,11 @@
 
 <!-- INPUT -->
 <form method="POST" class="input-area" onsubmit="return showTyping()">
-    <input type="text" name="message" id="msgInput" placeholder="Ask something about AI..." required>
+    <input type="text" name="message" id="msgInput" placeholder="Type your message..." required>
     <button type="submit"><i class="fa fa-paper-plane"></i></button>
 </form>
 
+</div>
 </div><script>
     const box = document.getElementById("chatBox");
 
