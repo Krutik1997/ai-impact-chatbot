@@ -71,7 +71,7 @@
 
 {"tag":"ai_weather","patterns":["weather","forecast","climate","ai weather","storm prediction"],"responses":["AI predicts weather using historical data."]},
 
-{"tag":"ai_emergency","patterns":["emergency","disaster","rescue","ai emergency","crisis"],"responses":["AI helps in disaster prediction and rescue planning."]}
+{"tag":"ai_emergency","patterns":["emergency","disaster","rescue","ai emergency","crisis"],"responses":["AI helps in disaster prediction and rescue planning."]},
 {"tag":"ai_legal","patterns":["law","legal","ai law","court ai","legal system"],"responses":["AI helps in legal research, case analysis, and document review."]},
 
 {"tag":"ai_hr","patterns":["hr","human resource","recruitment","ai hiring","job screening"],"responses":["AI helps in resume screening, hiring decisions, and employee management."]},
@@ -110,7 +110,7 @@
 
 {"tag":"ai_navigation","patterns":["navigation","maps","gps","route planning","ai maps"],"responses":["AI provides route optimization and real-time navigation support."]},
 
-{"tag":"ai_security_surveillance","patterns":["cctv","surveillance","security camera","ai monitoring","face detection"],"responses":["AI monitors security cameras and detects suspicious activities."]}
+{"tag":"ai_security_surveillance","patterns":["cctv","surveillance","security camera","ai monitoring","face detection"],"responses":["AI monitors security cameras and detects suspicious activities."]},
 {"tag":"ai_pharma","patterns":["pharma","medicine industry","drug discovery","ai pharma"],"responses":["AI accelerates drug discovery and pharmaceutical research."]},
 {"tag":"ai_chemistry","patterns":["chemistry","chemical analysis","ai chemistry"],"responses":["AI helps in chemical simulations and compound discovery."]},
 {"tag":"ai_physics","patterns":["physics","quantum ai","ai physics"],"responses":["AI supports simulations and complex physics calculations."]},
